@@ -9,10 +9,9 @@ const FoodCard = ({
   translate,
 }) => (
   <CardContainer>
-    {console.log(food)}
-    <CardHeader>{translate('name', food)}</CardHeader>
-    <CardContent>{translate('meal', food)}</CardContent>
-    <CardContent>{translate('description', food)}</CardContent>
+    <CardHeader>{('name', food)}</CardHeader>
+    <CardContent>{('meal', food)}</CardContent>
+    <CardContent>{('description', food)}</CardContent>
   </CardContainer>
 );
 
@@ -21,52 +20,47 @@ const AnimalCard = ({
   translate,
 }) => (
   <CardContainer>
-    {console.log(animal)}
-    <CardHeader>{translate('species', animal)}</CardHeader>
-    <CardContent>Biome: {translate('biome', animal)}</CardContent>
-    <CardContent>Color: {translate('color', animal)}</CardContent>
+    {console.log('chris', translate)}
+    <CardHeader>{AnimalCard.translate('species', AnimalCard.animal)}</CardHeader>
+    <CardContent>Biome: {AnimalCard.translate('biome', AnimalCard.animal)}</CardContent>
+    <CardContent>Color: {AnimalCard.translate('color', AnimalCard.animal)}</CardContent>
   </CardContainer>
 );
+// const AnimalCard = ({
+//   animal,
+//   translate,
+// }) => (
+//   <CardContainer>
+//     {console.log('chris', translate, animal)}
+//     <CardHeader>{translate('species', animal)}</CardHeader>
+//     <CardContent>Biome: {translate('biome', animal)}</CardContent>
+//     <CardContent>Color: {translate('color', animal)}</CardContent>
+//   </CardContainer>
+// );
 
-// const translate = (string, details) => {
-//   for (var item in details) {
-//     if (item === string && details !== undefined) {
-//       // console.log(details[item]['en'])
-//       return details[item]['en'];
-//     }
-//   }
-// }
 // FIXME: Add your code here 
 const createTranslate = (obj) => {
-  const translate = (string, animalObj) => {
-    for (var item in animalObj) {
-        // console.log(item === string)
-      if (item === string && animalObj !== undefined) {
-        // console.log(details)
-        return animalObj[item]['en'];
+  const translate = (string, obj) => {
+    for (var item in obj) {
+      if (item === string) {
+        return obj[item][translate.language]
       }
     }
   }
-    var inner = function(func, language){
-      for (var keys in obj) {
-        var details = obj[keys];
-        for (var key in details) {
-          var animal = details;
-          var food = details;
-        }
-        if (func === AnimalCard) {
-          AnimalCard({animal, translate});
-          return translate(key, animal)
-        } 
-        if (func === FoodCard) {
-          FoodCard({food, translate}); 
-          return translate(key, food)
-        }
-      }
-    }
-    
-    return inner
-  };
+  const returnedInner = (func, language) => {
+    var promises = [];
+    func.translate = translate;
+    func.translate.language = language
+    Object.keys(obj).forEach((item) => {
+      var name = obj[item];
+      func.animal = obj[item];
+      promises.push(func({name, translate}))
+    })
+    console.log(promises)
+    return func
+  }
+  return returnedInner
+};
 
 const translateAnimal = createTranslate(animalTranslations);
 const translateFood = createTranslate(foodTranslations);
@@ -80,13 +74,12 @@ const App = () => {
   const animals = ['tiger', 'lion', 'hippo', 'platypus'];
   const foods = ['cake', 'pizza', 'hotdog', 'pancake'];
 
-  const TranslatedAnimalCards = animals.map(a => <TranslatedAnimalCard animal={a} />);
-  console.log(TranslatedAnimalCards) // issue is here!!!!!!!!!
+  const TranslatedAnimalCards = animals.map(a => <TranslatedAnimalCard key={a} animal={a} />);
   const TranslatedFoodCards = foods.map(f => <TranslatedFoodCard food={f} />);
 
   return (
     <div>
-      <select value={language} >
+      <select id="language" value={language} onChange={() => setLanguage(document.getElementById("language").options[document.getElementById("language").selectedIndex].value)}>
         <option value="en">English</option>
         <option value="es">Español</option>
         <option value="ru">русский</option>
@@ -103,3 +96,37 @@ const App = () => {
 }
 
 export default App;
+
+
+// const createTranslate = (obj) => {
+//   const translate = (string, animalObj) => {
+//     // for (var item in animalObj) {
+//         // console.log(item === string)
+//       // if (item === string && animalObj !== undefined) {
+//         // console.log(details)
+        
+//         return 'animalObj'
+//     //   }
+//     // }
+//   }
+//   // return <AnimalCard animal={animal} translate={translate}/>
+//     var inner = function(func, language){
+//       for (var keys in obj) {
+//         var details = obj[keys];
+//         for (var key in details) {
+//           // console.log(details)
+//           var animal = details;
+//           var food = details;
+//         }
+//         if (func === AnimalCard) {
+//           AnimalCard({animal})
+//           return translate(key, animal);
+//         } 
+//         if (func === FoodCard) {
+          
+//           // return FoodCard({food, translate}); 
+//         }
+//       }
+//     }
+//     return inner
+//   };
